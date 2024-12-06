@@ -5,245 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
 using static System.Console;
-namespace OOP_Progect_Library
+namespace dosomething
 {
-    class Book
-    {
-        public readonly string Title;
-        public readonly string Author;
-        public readonly string Subject;
-        public bool IsAvailable;
-        public Book(string Title, string Author, string Subject)
-        {
-            this.Title = Title;
-            this.Author = Author;
-            this.Subject = Subject;
-            IsAvailable = true;
-        }
-    }
-    class Library
-    {
-        public List<Book> Books = new List<Book>();
-        public Library()
-        {
-            Books = new List<Book>
-            {
-            new Book("Origins", "Lewis Dartnell", "History"),
-            new Book("1491", "Charles C. Mann", "History"),
-            new Book("Sapiens", "Yuval Noah Harari", "History"),
-            new Book("Cosmos", "Carl Sagan", "Physics"),
-            new Book("Light", "Albert A. Michelson", "Physics"),
-            new Book("Quantum", "Manjit Kumar", "Physics"),
-            new Book("Animal Farm", "George Orwell", "Novels"),
-            new Book("Dracula", "Bram Stoker", "Novels"),
-            new Book("Frankenstein", "Mary Shelley", "Novels"),
-            new Book("Ethics", "Baruch Spinoza", "Philosophy"),
-            new Book("Being", "Martin Heidegger", "Philosophy"),
-            new Book("Existence", "Jean-Paul Sartre", "Philosophy") ,
-            new Book("test1","test2","History"),
-            new Book("test1","test2","Novels"),
-            new Book("test4","test3","Philosophy"),
-            new Book("test4","test3","Uncategorized")
-            };
-        }
-        //search method
-        public List<Book> Search(string Title, string Author)
-        {
-            if (string.IsNullOrWhiteSpace(Title) || string.IsNullOrWhiteSpace(Author))
-                throw new Exception("Author name or book title cannot be blank.");
-            List<Book> temp_Books = (from book in Books
-                                     where book.Title == Title && book.Author == Author
-                                     select book).ToList();
-            return temp_Books;
-        }
-        //We will use this method if the user doesn't know whether what they know is the title or the author's name
-        public (List<Book>, List<Book>) SearchByBoth(string TitleOrAuthor)
-        {
-            if (string.IsNullOrWhiteSpace(TitleOrAuthor))
-                throw new Exception("there is no book whose author's name or title are nothing!!!!!");
-
-            List<Book> MatchTheAuthorsName = new List<Book>();
-            List<Book> MatchTheTitle = new List<Book>();
-
-            for (int i = 0; i < Books.Count; i++)
-            {
-                if (Books[i].Title == TitleOrAuthor)
-                    MatchTheTitle.Add(Books[i]);
-                if (Books[i].Author == TitleOrAuthor)
-                    MatchTheAuthorsName.Add(Books[i]);
-            }
-
-            return (MatchTheAuthorsName, MatchTheTitle);
-        }
-        public void Add(Book Added_Book)
-        {
-            if (string.IsNullOrWhiteSpace(Added_Book.Title) || string.IsNullOrWhiteSpace(Added_Book.Author))
-            {
-                throw new Exception("the book must have a title and author name");
-            }
-            for (int i = 0; i < Books.Count; i++)
-                if (Books[i].Author == Added_Book.Author && Books[i].Title == Added_Book.Title && Books[i].Subject == Added_Book.Subject)
-                {
-                    WriteLine("the book is already in the library.");
-                    return;
-                }
-            WriteLine("The book has been added.\n--------------------");
-            Books.Add(Added_Book);
-        }
-        //Show random books to user
-        public void DisPlayRandomBook()
-        {
-            int limit;
-            if (Books.Count == 0)
-            { WriteLine("there is no book in this library!."); return; }
-            else if (Books.Count < 4)
-                limit = Books.Count;
-            else
-                limit = 4;
-            Random random = new Random();
-            int i = 0;
-            while (i < limit)
-            {
-                ForegroundColor = ConsoleColor.Black;
-                BackgroundColor = ConsoleColor.White;
-                int index = random.Next(0, Books.Count);
-                WriteLine("Title: {0}\nAuthor: {1}\nSubject: {2}", Books[index].Title, Books[index].Author, Books[index].Subject);
-                ResetColor();
-                WriteLine("-----------------------------");
-                i++;
-            }
-        }
-        public int Group_Dispaly(List<Book> books)
-        {
-            int counter = 0;
-            foreach (Book temp in books)
-            {
-                if (temp.IsAvailable)
-                    counter++;
-                ForegroundColor = ConsoleColor.Black;
-                BackgroundColor = ConsoleColor.White;
-                Information_Of_Book(temp);
-                ResetColor();
-                WriteLine("============================");
-            }
-            return counter;
-        }
-        public void Information_Of_Book(Book book)
-        {
-            string Available_Or_Not = "this book is available";
-            if (!book.IsAvailable)
-                Available_Or_Not = "this book is not available";
-            WriteLine("Title: {0}\nAuthor: {1}\nSubject: {2}\n{3}.", book.Title, book.Author, book.Subject, Available_Or_Not);
-        }
-        // this fuction displays books for a given topic
-        public void Books_Subject(string subject)
-        {
-            List<Book> temp_Books = (from book in Books where book.Subject == subject select book).ToList();
-            Group_Dispaly(temp_Books);
-        }
-    }
-    class Menu
-    {
-        string[] Option;
-        string Title;
-        public int Selected_Index;
-        public Menu(string[] Option, string Title)
-        {
-            this.Option = Option;
-            this.Title = Title;
-            Selected_Index = 0;
-        }
-        //only used in run method.
-        private void View()
-        {
-            if (Selected_Index >= Option.Length)
-                Selected_Index = 0;
-            WriteLine(Title + "\n");
-            for (int i = 0; i < Option.Length; i++)
-            {
-                if (i != Selected_Index)
-                    WriteLine($"-{Option[i]}");
-                else
-                {
-                    ForegroundColor = ConsoleColor.Black;
-                    BackgroundColor = ConsoleColor.White;
-                    WriteLine($"-{Option[i]}  <<");
-                    ResetColor();
-                }
-            }
-        }
-        // this method will run the Menu.
-        public int Run()
-        {
-            ConsoleKeyInfo KeyPressed;
-            do
-            {
-                Clear();
-                View();
-                KeyPressed = ReadKey(true);
-                if (KeyPressed.Key == ConsoleKey.UpArrow)
-                {
-                    Selected_Index--;
-                    if (Selected_Index == -1)
-                        Selected_Index = Option.Length - 1;
-                }
-                else if (KeyPressed.Key == ConsoleKey.DownArrow)
-                {
-                    Selected_Index++;
-                    if (Selected_Index > Option.Length)
-                        Selected_Index = 0;
-                }
-            } while (KeyPressed.Key != ConsoleKey.Enter);
-            Clear();
-            return Selected_Index;
-        }
-        // just to ask the user if he want to repeate the process or not
-        static public ConsoleKeyInfo Answer_Y_N()
-        {
-            ConsoleKeyInfo Choois;
-
-            while (true)
-            {
-                Choois = ReadKey(true);
-                if (Choois.Key == ConsoleKey.Y || Choois.Key == ConsoleKey.N)
-                {
-                    Clear();
-                    break;
-                }
-                if (Choois.Key != ConsoleKey.Y || Choois.Key != ConsoleKey.N)
-                    continue;
-            }
-            return Choois;
-        }
-        static public (ConsoleKeyInfo, string) CaptureExitKey(string Title)
-        {
-            ConsoleKeyInfo KeyPressed;
-            string TheString = "";
-            Write(Title);
-            do
-            {
-                KeyPressed = ReadKey(true);
-                if (KeyPressed.Key == ConsoleKey.Backspace)
-                {
-                    if (TheString.Length > 0)
-                    {
-                        Clear();
-                        Write(Title);
-                        TheString = TheString.Remove(TheString.Length - 1);
-                        Write(TheString);
-                    }
-                    continue;
-                }
-                if (KeyPressed.KeyChar != 13 && KeyPressed.KeyChar != 27)
-                {
-                    Write(KeyPressed.KeyChar);
-                    TheString += KeyPressed.KeyChar;
-                }
-            } while (KeyPressed.Key != ConsoleKey.Escape && KeyPressed.Key != ConsoleKey.Enter);
-            WriteLine();
-            return (KeyPressed, TheString);
-        }
-    }
     internal class Program
     {
         static void Main(string[] args)
@@ -307,29 +70,15 @@ namespace OOP_Progect_Library
                                         WriteLine("Do you want to borrow one of the available books? (Y/N)");
                                         if (Menu.Answer_Y_N().Key == ConsoleKey.Y)
                                         {
-                                            int i = 0;
-                                            string[] Borrow_Menu_Option = new string[counter];
-                                            foreach (Book temp in temp_List)
+                                           Menu temp_Menu= Menu.Creat_Borrow_Menu(temp_List, counter);
+                                           int index_Borrow_Book= temp_Menu.Run();
+                                            string ttt = temp_Menu.Option[index_Borrow_Book];
+                                            foreach(Book book in temp_List)
                                             {
-                                                if (temp.IsAvailable)
-                                                {
-                                                    Borrow_Menu_Option[i] = $"{temp.Title} by {temp.Author}. /({temp.Subject}).";
-                                                    i++;
-                                                }
+                                                if ($"{book.Title} by {book.Author}. /({book.Subject})." == ttt)
+                                                    book.IsAvailable = false;
                                             }
-                                            Menu Borrow_Menu = new Menu(Borrow_Menu_Option, "---Select the book you want to borrow---");
-
-                                            int index_Borrowed_Book = Borrow_Menu.Run();
-                                            foreach (Book temp in temp_List)
-                                            {
-                                                string trye = $"{temp.Title} by {temp.Author}. /({temp.Subject}).";
-                                                if (Borrow_Menu_Option[index_Borrowed_Book].Equals(trye))
-                                                {
-                                                    temp.IsAvailable = false;
-                                                    break;
-                                                }
-                                            }
-                                            WriteLine("The Book will reach you soon :)");
+                                            WriteLine("The book will reach you soon :)");
                                         }
                                     }
                                 }
@@ -392,38 +141,22 @@ namespace OOP_Progect_Library
 
                             if (Menu.Answer_Y_N().Key == ConsoleKey.Y)
                             {
-                                int index_Of_Borrow_Option = 0;
-                                string[] Borrow_Menu_Option = new string[counter];
+                               Menu temp_Borrow_Menu= Menu.Creat_Borrow_Menu(temp_List_Title, counter, temp_List_Author);
 
-                                foreach (Book temp in temp_List_Title)
+                                int index_Borrow_Book = temp_Borrow_Menu.Run();
+                                string ttt = temp_Borrow_Menu.Option[index_Borrow_Book];
+                                    temp_List_Title.AddRange(temp_List_Author);
+
+                                foreach (Book book in temp_List_Title)
                                 {
-                                    if (temp.IsAvailable)
-                                    {
-                                        Borrow_Menu_Option[index_Of_Borrow_Option] = $"{temp.Title} by {temp.Author}. /({temp.Subject}).";
-                                        index_Of_Borrow_Option++;
-                                    }
+                                    if ($"{book.Title} by {book.Author}. /({book.Subject})." == ttt)
+                                        book.IsAvailable = false;
                                 }
-                                foreach (Book temp in temp_List_Author)
-                                {
-                                    if (temp.IsAvailable)
-                                    {
-                                        Borrow_Menu_Option[index_Of_Borrow_Option] = $"{temp.Title} by {temp.Author}. /({temp.Subject}).";
-                                        index_Of_Borrow_Option++;
-                                    }
-                                }
-                                Menu Borrow_Menu = new Menu(Borrow_Menu_Option, "---Select the book you want to borrow---");
-                                List<Book> To_Borrow_Books = temp_List_Author.Concat(temp_List_Title).ToList();
-                                int index_Borrowed_Book = Borrow_Menu.Run();
-                                foreach (Book temp in To_Borrow_Books)
-                                {
-                                    string trye = $"{temp.Title} by {temp.Author}. /({temp.Subject}).";
-                                    if (Borrow_Menu_Option[index_Borrowed_Book].Equals(trye))
-                                    {
-                                        temp.IsAvailable = false;
-                                        break;
-                                    }
-                                }
-                                WriteLine("The Book will reach you soon :)");
+                                WriteLine("The book will reach you soon :)");
+
+
+
+
                             }
                             WriteLine("Another search? (Y/N)");
                             if (Menu.Answer_Y_N().Key == ConsoleKey.N)
