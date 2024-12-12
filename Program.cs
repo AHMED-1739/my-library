@@ -12,10 +12,10 @@ namespace dosomething
         static void Main(string[] args)
         {
             string[] Start_Menu_Option = { "Search", "Add", "Exit" };
-            string[] Search_Menu_Option = { "Title & Author", "Title OR Author", "Subject", "Random books?", "Back" };
-            string[] Subject_Menu_Option = { "History", "Physics", "Novels", "Philosophy", "Uncategorized", "Back" };
-            Menu Search_Menu = new Menu(Search_Menu_Option, "----Search----");
-            Menu Subject_Menu = new Menu(Subject_Menu_Option, "-----Subject-----");
+            string[] Search_Menu_Option = { "Title & Author", "Title OR Author", "Subject", "Random books?"};
+            string[] Subject_Menu_Option = { "History", "Physics", "Novels", "Philosophy", "Uncategorized" };
+            Menu Search_Menu = new Menu(Search_Menu_Option, "ESC.\n----Search----");
+            Menu Subject_Menu = new Menu(Subject_Menu_Option, "ESC.\n-----Subject-----");
             Menu Start_Menu = new Menu(Start_Menu_Option, @"
         ██╗     ██╗██████╗ ██████╗  █████╗ ██████╗ ██╗   ██╗
         ██║     ██║██╔══██╗██╔══██╗██╔══██╗██╔══██╗╚██╗ ██╔╝
@@ -37,7 +37,10 @@ namespace dosomething
                     int Search_Menu_Index = Search_Menu.Run();
                     Clear();
                     while (true)
+                       
                     {
+                        if (Search_Menu_Index == -1)
+                            break;
                         //Title & Author.
                         if (Search_Menu_Index == 0)
                         {
@@ -141,22 +144,18 @@ namespace dosomething
 
                             if (Menu.Answer_Y_N().Key == ConsoleKey.Y)
                             {
-                               Menu temp_Borrow_Menu= Menu.Creat_Borrow_Menu(temp_List_Title, counter, temp_List_Author);
-
+                                List<Book> temp_List=SomeMethod<Book>.merge(temp_List_Author, temp_List_Title); 
+                                Menu temp_Borrow_Menu= Menu.Creat_Borrow_Menu(temp_List, temp_List.Count);
                                 int index_Borrow_Book = temp_Borrow_Menu.Run();
                                 string ttt = temp_Borrow_Menu.Option[index_Borrow_Book];
-                                    temp_List_Title.AddRange(temp_List_Author);
+                                 
 
-                                foreach (Book book in temp_List_Title)
+                                foreach (Book book in temp_List)
                                 {
                                     if ($"{book.Title} by {book.Author}. /({book.Subject})." == ttt)
                                         book.IsAvailable = false;
                                 }
                                 WriteLine("The book will reach you soon :)");
-
-
-
-
                             }
                             WriteLine("Another search? (Y/N)");
                             if (Menu.Answer_Y_N().Key == ConsoleKey.N)
@@ -172,7 +171,7 @@ namespace dosomething
                             //which will return a list of books related to the Selected Subject.
                             int index = Subject_Menu.Run();
                             //if Back
-                            if (index == 5)
+                            if (index == -1)
                                 break;
 
                             library.Books_Subject(Subject_Menu_Option[index]);

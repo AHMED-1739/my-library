@@ -58,6 +58,8 @@ namespace dosomething
                     if (Selected_Index > Option.Length)
                         Selected_Index = 0;
                 }
+                else if (KeyPressed.Key == ConsoleKey.Escape)
+                    return -1;
             } while (KeyPressed.Key != ConsoleKey.Enter);
             Clear();
             return Selected_Index;
@@ -108,20 +110,19 @@ namespace dosomething
             WriteLine();
             return (KeyPressed, TheString);
         }
-        static public Menu Creat_Borrow_Menu(List<Book> books, int length1)
+        static public Menu Creat_Borrow_Menu(List<Book> books, int length1,List<Book>books2=null)
         {           
             string[] temp_array = new string[length1];
-            int index = 0;
+            int index = -1;
 
             foreach (Book book in books)
             {
                 if (book.IsAvailable)
                 { 
-                    temp_array[index] = $"{book.Title} by {book.Author}. /({book.Subject}).";
-                    index++;
+                    temp_array[++index] = $"{book.Title} by {book.Author}. /({book.Subject}).";
+                   
                 }
             }
-            temp_array[index] = "Back";
 
             return new Menu(temp_array, "----Borrow a book----"); ;
         }
